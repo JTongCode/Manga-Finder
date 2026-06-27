@@ -50,16 +50,14 @@ const handleOnStartState = function() {
 
 startButton.onclick = function() {
     handleOnStartState();
-
-    links = findLinks();
-    setLinks(links);
+    findLinks().then(setLinks)
 
     const prefs = {
         title: titleElement.value,
         chapter: chapterElement.value,
         language: languageElement.value
     }
-
+    console.log("passed")
     chrome.runtime.sendMessage({ event: 'onStart', prefs})
 }
 
@@ -90,11 +88,10 @@ chrome.storage.local.get(["title", "chapter", "language", "isRunning"], (result)
 })
 
 //AI Operation
-const findLinks = function() {
-    links = []
-    title = titleElement.value
-    chapter = chapterElement.value
-    language = languageElement.value
+findLinks = function() {
+    const title = titleElement.value
+    const chapter = chapterElement.value
+    const language = languageElement.value
 
     const promptText = `I need 5 links to 
     a manga named ${title} on chapter ${chapter} in ${language}.
@@ -108,14 +105,29 @@ const findLinks = function() {
     Your entire response must consist solely of the web addresses.
     `
 
-    chrome.runtime.sendMessage({type: "ASK_GEMINI", prompt: promptText }, (response) => {
-        links = response.text.split(" ") //will need to splice 'response' into a list
-    })
-    return links
+     return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage(
+            { type: "ASK_GEMINI", prompt: promptText },
+            (response) => {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                    return;
+                }
+
+                resolve(response.text.split(" "));
+            }
+        );
+    });
 }
 
 const setLinks = function(links) {
+
     linkDropdownElement.innerHTML = ""
+    let defSelect = document.createElement("option")
+    defSelect.innerHTML = "Select a Link"
+    linkDropdownElement.appendChild(defSelect)
+
+
     console.log(links)
     console.log(typeof links)
     links.forEach(link => {
@@ -124,4 +136,6 @@ const setLinks = function(links) {
         optionElement.innerHTML = "Link"
         linkDropdownElement.appendChild(optionElement)
     })
+    handleOnStopState();
+    chrome.runtime.sendMessage({ event: 'onStop'})
 }
