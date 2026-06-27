@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "https://esm.sh/@google/genai";
 
 //Gemini API Setup
-const API_KEY = "AQ.Ab8RN6LkNJaRmhDthi0uL4xVJhqtXcj2gGbzDLK46knNuir5TA"
+const API_KEY = ""
 const ai = new GoogleGenAI({ apiKey:API_KEY})
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -16,7 +16,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function generateAIResponse(userInput) {
-    // Utilizing the standard interactions capability for text generation
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: userInput
@@ -42,13 +41,10 @@ chrome.runtime.onMessage.addListener(data => {
 })
 
 const handleOnStop = function() {
-    //console.log("On stop in background")
     setRunningStatus(false);
 }
 
 const handleOnStart = function(prefs) {
-    //console.log("On start in background")
-    //console.log("Prefs received: ", prefs)
     setRunningStatus(true);
 
     chrome.storage.local.set(prefs)
