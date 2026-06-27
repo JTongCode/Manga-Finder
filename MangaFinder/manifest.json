@@ -1,0 +1,25 @@
+{
+    "name": "Manga Website Finder",
+    "description": "Finds safe websites to read specified Mangas",
+    "version": "0.0.1",
+    "manifest_version": 3, 
+
+    "action": {
+        "default_popup": "popup/popup.html",
+        "default_icon" : {"48":"assets/comick.png"}    
+    },
+
+    "icons": {
+            "16": "assets/comick.png",
+            "32": "assets/comick.png",
+            "48": "assets/comick.png",
+            "128": "assets/comick.png"
+    },
+
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+
+    "permissions": ["storage"]
+}
